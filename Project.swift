@@ -24,7 +24,9 @@ let project = Project(
         "brainy/Sources",
         "brainy/Resources",
       ],
-      dependencies: []
+      dependencies: [
+        .package(product: "ComposableArchitecture")
+      ]
     ),
     .target(
       name: "brainyTests",
