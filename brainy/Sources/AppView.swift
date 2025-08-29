@@ -3,7 +3,7 @@ import ComposableArchitecture
 
 struct AppView: View {
 
-  @Bindable var store: StoreOf<AppFeature>
+  @Bindable var store: StoreOf<AppReducer>
 
   var body: some View {
     NavigationStack(

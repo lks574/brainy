@@ -1,7 +1,7 @@
 import ComposableArchitecture
 
 @Reducer
-struct AppFeature {
+struct AppReducer {
 
   @ObservableState
   struct State: Equatable {

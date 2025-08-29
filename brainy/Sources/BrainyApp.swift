@@ -3,11 +3,11 @@ import ComposableArchitecture
 
 @main
 struct BrainyApp: App {
-  @State private var store: StoreOf<AppFeature>
+  @State private var store: StoreOf<AppReducer>
 
   init() {
-    let store = Store(initialState: AppFeature.State()) {
-      AppFeature()
+    let store = Store(initialState: AppReducer.State()) {
+      AppReducer()
     }
     self._store = State(initialValue: store)
   }
