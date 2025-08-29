@@ -41,7 +41,7 @@ struct TextQuizReducer {
     case startStage
   }
 
-  var body: some Reducer<State, Action> {
+  var body: some ReducerOf<Self> {
     BindingReducer()
 
     Reduce { state, action in
@@ -58,8 +58,7 @@ struct TextQuizReducer {
       case .tapSubmitAnswer:
         return .none
 
-      case .tapOption(let index):
-        print("aaa index", index)
+      case .tapOption:
         return .none
 
       case .startStage:

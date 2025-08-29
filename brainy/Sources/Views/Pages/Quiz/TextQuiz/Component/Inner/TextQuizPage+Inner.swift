@@ -1,9 +1,6 @@
 import SwiftUI
 
 extension TextQuizPage {
-
-  
-
   struct LoadingView: View {
     var body: some View {
       VStack(spacing: 24) {

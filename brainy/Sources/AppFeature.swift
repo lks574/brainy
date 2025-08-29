@@ -34,6 +34,13 @@ struct AppFeature {
           state.path.removeLast()
         }
         return .none
+
+      case .path(.element(id: _, action: .textQuiz(.goToBack))):
+        if !state.path.isEmpty {
+          state.path.removeLast()
+        }
+        return .none
+
       case .path, .root:
         return .none
       }

@@ -3,7 +3,7 @@ import SwiftUI
 
 enum TextQuizPage {
   struct RootView: View {
-    var store: StoreOf<TextQuizReducer>
+    @Bindable var store: StoreOf<TextQuizReducer>
 
     var body: some View {
       ZStack {
