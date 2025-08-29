@@ -55,3 +55,21 @@ enum QuizDifficulty: String, Codable, CaseIterable, Sendable {
     }
   }
 }
+
+enum QuestionFilter: String, Codable, CaseIterable, Sendable {
+  case random = "random"
+  case newest = "newest"
+  case oldest = "oldest"
+  case difficulty = "difficulty"
+  case excludeSolved = "excludeSolved"
+
+  var displayName: String {
+    return switch self {
+    case .random: "랜덤"
+    case .newest: "최신순"
+    case .oldest: "오래된순"
+    case .difficulty: "난이도순"
+    case .excludeSolved: "풀었던 것 제외"
+    }
+  }
+}
