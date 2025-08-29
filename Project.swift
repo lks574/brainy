@@ -11,7 +11,7 @@ let project = Project(
       destinations: .iOS,
       product: .app,
       bundleId: "com.sro.brainy",
-      deploymentTargets: .iOS("16.0"),
+      deploymentTargets: .iOS("17.0"),
       infoPlist: .extendingDefault(
         with: [
           "UILaunchScreen": [
