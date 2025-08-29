@@ -6,14 +6,12 @@ struct AppFeature {
   @ObservableState
   struct State: Equatable {
     var path = StackState<Path.State>()
-    var rootState = TextQuizReducer.State(quizMode: .multipleChoice, quizCategory: .drama, stageId: "123")
   }
 
   enum Action {
     case path(StackAction<Path.State, Path.Action>)
     case goToTextQuiz(QueryItem.TextQuiz)
     case goToBack
-    case root(TextQuizReducer.Action)
   }
 
   @Reducer(state: .equatable)
@@ -35,13 +33,7 @@ struct AppFeature {
         }
         return .none
 
-      case .path(.element(id: _, action: .textQuiz(.goToBack))):
-        if !state.path.isEmpty {
-          state.path.removeLast()
-        }
-        return .none
-
-      case .path, .root:
+      case .path:
         return .none
       }
     }

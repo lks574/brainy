@@ -1,8 +1,9 @@
 import ComposableArchitecture
-import SwiftUI
 
 @Reducer
 struct TextQuizReducer {
+
+  @Dependency(\.navigation) var navigation
 
   @ObservableState
   struct State: Equatable {
@@ -50,7 +51,9 @@ struct TextQuizReducer {
         return .none
 
       case .goToBack:
-        return .none
+        return .run { _ in
+          await navigation.goToBack()
+        }
 
       case .tapRetry:
         return .none
