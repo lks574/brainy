@@ -22,6 +22,11 @@ struct AppView: View {
           {
             Text("QuizModeSelectionPage 이동")
           }
+
+          Button(action: { store.send(.goToQuizCategorySelection(.multipleChoice)) })
+          {
+            Text("QuizCategorySelectionPage 이동")
+          }
         }
       },
       destination: { store in
@@ -30,6 +35,8 @@ struct AppView: View {
           TextQuizPage.RootView(store: store)
         case .quizModeSelection(let store):
           QuizModeSelectionPage.RootView(store: store)
+        case .quizCategorySelection(let store):
+          QuizCategorySelectionPage.RootView(store: store)
         }
       })
   }

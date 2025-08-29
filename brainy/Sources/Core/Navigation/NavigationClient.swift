@@ -4,6 +4,7 @@ import ComposableArchitecture
 struct NavigationClient {
   var goToTextQuiz: @Sendable (QueryItem.TextQuiz) async -> Void
   var goToQuizModeSelection: @Sendable () async -> Void
+  var goToQuizCategorySelection: @Sendable (QuizMode) async -> Void
   var goToBack: @Sendable () async -> Void
 }
 
@@ -11,12 +12,14 @@ extension NavigationClient: DependencyKey {
   static var liveValue = NavigationClient(
     goToTextQuiz: { _ in },
     goToQuizModeSelection: { },
+    goToQuizCategorySelection: { _ in },
     goToBack: { }
   )
 
   static let testValue = NavigationClient(
     goToTextQuiz: { _ in },
     goToQuizModeSelection: { },
+    goToQuizCategorySelection: { _ in },
     goToBack: { }
   )
 }

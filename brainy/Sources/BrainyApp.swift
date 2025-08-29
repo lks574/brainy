@@ -30,6 +30,9 @@ struct BrainyApp: App {
       goToQuizModeSelection: { [store] in
         await store.send(.goToQuizModeSelection)
       },
+      goToQuizCategorySelection: { [store] mode in
+        await store.send(.goToQuizCategorySelection(mode))
+      },
       goToBack: { [store] in
         await store.send(.goToBack)
       }

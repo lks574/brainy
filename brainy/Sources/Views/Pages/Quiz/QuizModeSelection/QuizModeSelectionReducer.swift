@@ -31,7 +31,9 @@ struct QuizModeSelectionReducer {
         guard quizMode == .multipleChoice else {
           return .none
         }
-        return .none
+        return .run { _ in
+          await navigation.goToQuizCategorySelection(quizMode)
+        }
 
       case .goToProfile:
         return .none

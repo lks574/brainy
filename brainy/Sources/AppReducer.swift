@@ -12,6 +12,7 @@ struct AppReducer {
     case path(StackAction<Path.State, Path.Action>)
     case goToTextQuiz(QueryItem.TextQuiz)
     case goToQuizModeSelection
+    case goToQuizCategorySelection(QuizMode)
     case goToBack
   }
 
@@ -19,6 +20,7 @@ struct AppReducer {
   enum Path {
     case textQuiz(TextQuizReducer)
     case quizModeSelection(QuizModeSelectionReducer)
+    case quizCategorySelection(QuizCategorySelectionReducer)
   }
 
   var body: some ReducerOf<Self> {
@@ -33,6 +35,10 @@ struct AppReducer {
         state.path.append(.quizModeSelection(
           .init())
         )
+        return .none
+
+      case .goToQuizCategorySelection(let mode):
+        state.path.append(.quizCategorySelection(.init(quizMode: mode)))
         return .none
 
       case .goToBack:

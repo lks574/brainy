@@ -24,18 +24,38 @@ enum QuizCategorySelectionPage {
           VStack(spacing: 20) {
             FilterSection(
               selectedQuestionFilter: store.selectedQuestionFilter,
-              action: { _ in })
+              action: { viewAction in
+                switch viewAction {
+                case .changeFilter(let questionFilter):
+                  store.send(.changeFilter(questionFilter))
+                }
+              }
+            )
 
             CategorySection(
               selectedCategory: store.selectedCategory,
               categoryProgress: store.categoryProgress,
-              action: { _ in })
+              action: { viewAction in
+                switch viewAction {
+                case .changeCategory(let quizCategory):
+                  store.send(.changeCategory(quizCategory))
+                }
+              }
+            )
           }
           .padding(.horizontal, 24)
         }
         BottomSection(
           canStartQuiz: canStartQuiz,
-          action: { _ in })
+          action: { viewAction in
+            switch viewAction {
+            case .quizPlay:
+              store.send(.goToQuizPlay)
+            case .back:
+              store.send(.goToBack)
+            }
+          }
+        )
       }
       .frame(maxWidth: .infinity, maxHeight: .infinity)
       .background(Color.brainyBackground)
