@@ -27,6 +27,9 @@ struct BrainyApp: App {
       goToTextQuiz: { [store] item in
         await store.send(.goToTextQuiz(item))
       },
+      goToQuizModeSelection: { [store] in
+        await store.send(.goToQuizModeSelection)
+      },
       goToBack: { [store] in
         await store.send(.goToBack)
       }

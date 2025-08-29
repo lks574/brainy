@@ -17,12 +17,19 @@ struct AppView: View {
           {
             Text("TextQuizPage 이동")
           }
+
+          Button(action: { store.send(.goToQuizModeSelection) })
+          {
+            Text("QuizModeSelectionPage 이동")
+          }
         }
       },
       destination: { store in
         switch store.case {
         case .textQuiz(let store):
           TextQuizPage.RootView(store: store)
+        case .quizModeSelection(let store):
+          QuizModeSelectionPage.RootView(store: store)
         }
       })
   }
