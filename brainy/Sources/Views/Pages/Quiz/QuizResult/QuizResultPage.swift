@@ -13,8 +13,8 @@ enum QuizResultPage {
           stageDisplayName: store.stageDisplayName,
           action: { viewAction in
             switch viewAction {
-            case .tapBack:
-              store.send(.goToQuizCategorySelection)
+            case .tapClose:
+              store.send(.goToClose)
             }
           }
         )
@@ -35,7 +35,7 @@ enum QuizResultPage {
                 case .tapRetryStage:
                   store.send(.retryStage)
                 case .tapOtherQuiz:
-                  store.send(.goToQuizCategorySelection)
+                  store.send(.goToClose)
                 case .tapHistory:
                   store.send(.goToHistory)
                 }

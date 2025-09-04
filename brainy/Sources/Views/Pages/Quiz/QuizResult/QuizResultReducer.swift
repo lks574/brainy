@@ -53,11 +53,11 @@ struct QuizResultReducer {
   enum Action: BindableAction, Sendable {
     case binding(BindingAction<State>)
     case retryStage
-    case goToQuizCategorySelection
+    case goToClose
     case goToHistory
   }
 
-  var body: some Reducer<State, Action> {
+  var body: some ReducerOf<Self> {
     BindingReducer()
 
     Reduce { state, action in
@@ -68,8 +68,10 @@ struct QuizResultReducer {
       case .retryStage:
         return .none
 
-      case .goToQuizCategorySelection:
-        return .none
+      case .goToClose:
+        return .run { _ in
+          await navigation.goToCloseWithCategorySelection(.multipleChoice)
+        }
 
       case .goToHistory:
         return .none

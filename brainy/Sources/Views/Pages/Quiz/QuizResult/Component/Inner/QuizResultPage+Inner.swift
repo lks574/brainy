@@ -8,7 +8,7 @@ extension QuizResultPage {
     let action: (Action) -> Void
 
     enum Action: Equatable, Sendable {
-      case tapBack
+      case tapClose
     }
 
     var body: some View {
@@ -17,7 +17,7 @@ extension QuizResultPage {
           Spacer()
 
           Button(action: {
-            action(.tapBack)
+            action(.tapClose)
           }) {
             Image(systemName: "xmark")
               .font(.system(size: 18, weight: .medium))

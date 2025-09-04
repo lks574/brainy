@@ -36,6 +36,12 @@ struct BrainyApp: App {
       goToQuizResult: { [store] result in
         await store.send(.goToQuizResult(result))
       },
+      goToCloseWithCategorySelection: { [store] mode in
+        await store.send(.goToCloseWithCategorySelection(mode))
+      },
+      goToClose: { [store] in
+        await store.send(.goToClose)
+      },
       goToBack: { [store] in
         await store.send(.goToBack)
       }

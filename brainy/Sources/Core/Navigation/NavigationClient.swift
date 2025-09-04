@@ -6,6 +6,8 @@ struct NavigationClient {
   var goToQuizModeSelection: @Sendable () async -> Void
   var goToQuizCategorySelection: @Sendable (QuizMode) async -> Void
   var goToQuizResult: @Sendable (QuizStageResultDTO) async -> Void
+  var goToCloseWithCategorySelection: @Sendable (QuizMode) async -> Void
+  var goToClose: @Sendable () async -> Void
   var goToBack: @Sendable () async -> Void
 }
 
@@ -15,6 +17,8 @@ extension NavigationClient: DependencyKey {
     goToQuizModeSelection: { },
     goToQuizCategorySelection: { _ in },
     goToQuizResult: { _ in },
+    goToCloseWithCategorySelection: { _ in },
+    goToClose: { },
     goToBack: { }
   )
 
@@ -23,6 +27,8 @@ extension NavigationClient: DependencyKey {
     goToQuizModeSelection: { },
     goToQuizCategorySelection: { _ in },
     goToQuizResult: { _ in },
+    goToCloseWithCategorySelection: { _ in },
+    goToClose: { },
     goToBack: { }
   )
 }

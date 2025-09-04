@@ -42,9 +42,16 @@ struct AppView: View {
           QuizModeSelectionPage.RootView(store: store)
         case .quizCategorySelection(let store):
           QuizCategorySelectionPage.RootView(store: store)
-        case .quizResult(let store):
-          QuizResultPage.RootView(store: store)
         }
-      })
+      }
+    )
+    .sheet(
+      store: store.scope(state: \.$present, action: \.present))
+    { store in
+      switch store.case {
+      case .quizResult(let store):
+        QuizResultPage.RootView(store: store)
+      }
+    }
   }
 }
