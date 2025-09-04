@@ -59,9 +59,12 @@ struct TextQuizReducer {
         return .none
 
       case .tapSubmitAnswer:
-        return .none
+        return .run { _ in
+          await navigation.goToQuizResult(.mock)
+        }
 
-      case .tapOption:
+      case .tapOption(let index):
+        state.selectedOptionIndex = index
         return .none
 
       case .startStage:

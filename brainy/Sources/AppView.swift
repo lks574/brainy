@@ -10,17 +10,23 @@ struct AppView: View {
       path: $store.scope(state: \.path, action: \.path),
       root: {
         VStack(spacing: 8) {
+          Text("시작")
+            .font(.headline)
+          Button(action: { store.send(.goToQuizModeSelection) })
+          {
+            Text("QuizModeSelectionPage 이동")
+          }
+
+          Divider()
+          Text("테스트")
+            .font(.headline)
+          
           Button(action: { store.send(.goToTextQuiz(.init(
             quizMode: .multipleChoice,
             quizCategory: .drama,
             stageID: "123123"))) })
           {
             Text("TextQuizPage 이동")
-          }
-
-          Button(action: { store.send(.goToQuizModeSelection) })
-          {
-            Text("QuizModeSelectionPage 이동")
           }
 
           Button(action: { store.send(.goToQuizCategorySelection(.multipleChoice)) })

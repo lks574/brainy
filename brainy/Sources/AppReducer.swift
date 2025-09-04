@@ -24,13 +24,6 @@ struct AppReducer {
   }
 
   @Reducer(state: .equatable)
-  enum Path {
-    case textQuiz(TextQuizReducer)
-    case quizModeSelection(QuizModeSelectionReducer)
-    case quizCategorySelection(QuizCategorySelectionReducer)
-  }
-
-  @Reducer(state: .equatable)
   enum Present {
     case quizResult(QuizResultReducer)
   }
@@ -80,13 +73,30 @@ struct AppReducer {
   }
 }
 
-
-extension StackState where Element: Equatable {
-  mutating func popOrPush(_ new: Element) {
-    if let i = self.lastIndex(of: new) {
+extension StackState where Element == Path.State {
+  fileprivate mutating func popOrPush(_ new: Element) {
+    if let i = self.lastIndex(where: { $0.caseID == new.caseID }) {
       self.removeSubrange(index(after: i)..<endIndex)
     } else {
       self.append(new)
+    }
+  }
+}
+
+@CasePathable
+@Reducer(state: .equatable)
+enum Path {
+  case textQuiz(TextQuizReducer)
+  case quizModeSelection(QuizModeSelectionReducer)
+  case quizCategorySelection(QuizCategorySelectionReducer)
+}
+
+extension Path.State {
+  fileprivate var caseID: String {
+    switch self {
+      case .textQuiz: "textQuiz"
+      case .quizModeSelection: "quizModeSelection"
+      case .quizCategorySelection: "quizCategorySelection"
     }
   }
 }

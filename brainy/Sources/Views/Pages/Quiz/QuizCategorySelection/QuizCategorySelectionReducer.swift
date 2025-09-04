@@ -48,7 +48,12 @@ struct QuizCategorySelectionReducer {
         }
 
       case .goToQuizPlay:
-        return .none
+        return .run { [state] _ in
+          await navigation.goToTextQuiz(.init(
+            quizMode: state.quizMode,
+            quizCategory: state.selectedCategory ?? .general,
+            stageID: "1"))
+        }
 
       case .changeFilter(let filter):
         state.selectedQuestionFilter = filter
@@ -59,12 +64,25 @@ struct QuizCategorySelectionReducer {
         return .none
 
       case .loadCategoryProgress:
-        return .none
+        return .run { send in
+          await send(.categoryProgressLoaded(.mock))
+        }
 
       case .categoryProgressLoaded(let progress):
         state.categoryProgress = progress
         return .none
       }
     }
+  }
+}
+
+extension [QuizCategory: QuizCategorySelectionReducer.CategoryProgress] {
+  fileprivate static var mock: Self {
+    [
+      .general: .init(
+        totalStages: 10,
+        completedStages: 1
+      ),
+    ]
   }
 }

@@ -66,18 +66,3 @@ enum QuizCategorySelectionPage {
     }
   }
 }
-
-struct QuizCategorySelectionPage_Previews: PreviewProvider {
-
-  static var previews: some View {
-    QuizCategorySelectionPage.RootView(
-      store: .init(
-        initialState: QuizCategorySelectionReducer.State(
-          quizMode: .multipleChoice),
-        reducer: {
-          QuizCategorySelectionReducer()
-        }
-      )
-    )
-  }
-}
