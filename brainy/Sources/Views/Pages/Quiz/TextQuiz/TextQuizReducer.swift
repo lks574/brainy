@@ -6,6 +6,7 @@ struct TextQuizReducer {
 
   @Dependency(\.navigation) var navigation
   @Dependency(\.quizClient) var quizClient
+  let sideEffect = TextQuizSideEffect()
 
   @ObservableState
   struct State: Equatable {
@@ -69,9 +70,43 @@ struct TextQuizReducer {
         return .none
 
       case .tapSubmitAnswer:
-        return .run { _ in
-          await navigation.goToQuizResult(.mock)
+        guard state.hasAnswered else { return .none }
+
+        // 사용자 답안 기록
+        let userAnswer = sideEffect.getUserAnswer(
+          selectedIndex: state.selectedOptionIndex,
+          shortAnswer: "",
+          question: state.currentQuestion)
+        state.userAnswers.append(userAnswer)
+
+        // 정답 체크 및 점수 업데이트
+        if let currentQuestion = state.currentQuestion {
+          let isCorrect = sideEffect.checkAnswer(
+            question: currentQuestion,
+            selectedIndex: state.selectedOptionIndex,
+            shortAnswer: ""
+          )
+          if isCorrect {
+            state.score += 1
+          }
         }
+
+        if state.currentQuestionIndex < state.quizQuestions.count - 1 {
+          state.currentQuestionIndex += 1
+          state.selectedOptionIndex = nil
+
+          // 진행률 업데이트
+          state.progress = Float(state.currentQuestionIndex) / Float(state.quizQuestions.count)
+
+          // 마지막 문제인지 확인
+          state.isLastQuestion = state.currentQuestionIndex == state.quizQuestions.count - 1
+        } else {
+          // 스테이지 완료
+          return .run { _ in
+            await navigation.goToQuizResult(.mock)
+          }
+        }
+        return .none
 
       case .tapOption(let index):
         state.selectedOptionIndex = index
