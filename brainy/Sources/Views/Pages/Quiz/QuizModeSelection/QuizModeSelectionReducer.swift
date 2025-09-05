@@ -5,6 +5,7 @@ import SwiftUI
 struct QuizModeSelectionReducer {
 
   @Dependency(\.navigation) var navigation
+  @Dependency(\.quizClient) var quizClient
 
   @ObservableState
   struct State: Equatable {
@@ -16,6 +17,8 @@ struct QuizModeSelectionReducer {
     case changeQuizMode(QuizMode)
     case goToProfile
     case goToHistoryList
+
+    case loadQuiz
   }
 
   var body: some Reducer<State, Action> {
@@ -40,6 +43,11 @@ struct QuizModeSelectionReducer {
 
       case .goToHistoryList:
         return .none
+
+      case .loadQuiz:
+        return .run { _ in
+          try await quizClient.loadInitialDataIfNeeded()
+        }
       }
     }
   }
