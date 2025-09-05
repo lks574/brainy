@@ -38,7 +38,7 @@ enum QuizModeSelectionPage {
       .frame(maxWidth: .infinity, maxHeight: .infinity)
       .background(Color.brainyBackground)
       .navigationBarHidden(true)
-      .onAppear {
+      .onLoad {
         store.send(.loadQuiz)
       }
     }
