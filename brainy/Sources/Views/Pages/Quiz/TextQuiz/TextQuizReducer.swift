@@ -37,6 +37,11 @@ struct TextQuizReducer {
       guard currentQuestionIndex < quizQuestions.count else { return nil }
       return quizQuestions[currentQuestionIndex]
     }
+
+    var getCurrentUserID: String {
+      // 실제 구현에서는 UserDefaults, Keychain 등에서 사용자 ID를 가져와야 함
+      return UserDefaults.standard.string(forKey: "current_user_id") ?? "default_user"
+    }
   }
 
   enum Action: BindableAction, Sendable {
@@ -48,9 +53,11 @@ struct TextQuizReducer {
     case tapOption(Int)
 
     case startStage
-    case getStageQuestions
+    case completeStage
 
+    case getStageQuestions
     case fetchStageQuestions([QuizQuestionDTO])
+    case stageQuestionsLoadFailed(String)
   }
 
   var body: some ReducerOf<Self> {
@@ -102,9 +109,7 @@ struct TextQuizReducer {
           state.isLastQuestion = state.currentQuestionIndex == state.quizQuestions.count - 1
         } else {
           // 스테이지 완료
-          return .run { _ in
-            await navigation.goToQuizResult(.mock)
-          }
+          return .send(.completeStage)
         }
         return .none
 
@@ -115,6 +120,27 @@ struct TextQuizReducer {
       case .startStage:
         state.startTime = Date()
         return .send(.getStageQuestions)
+
+      case .completeStage:
+        return .run { [state] send in
+          do {
+            let userId = state.getCurrentUserID
+            let totalTime = Date().timeIntervalSince(state.startTime)
+
+            let result = try await quizClient.createStageResult(
+              userId,
+              state.stageId,
+              state.score,
+              totalTime
+            )
+            await navigation.goToQuizResult(result)
+
+          } catch {
+            // 에러 처리
+            print("Failed to save stage result: \(error)")
+            await send(.stageQuestionsLoadFailed("결과 저장에 실패했습니다."))
+          }
+        }
 
       case .getStageQuestions:
         state.isLoading = true
@@ -133,7 +159,7 @@ struct TextQuizReducer {
             let questions = try await quizClient.fetchQuestionsForStage(stageId)
             await send(.fetchStageQuestions(questions))
           } catch {
-
+            await send(.stageQuestionsLoadFailed(error.localizedDescription))
           }
         }
 
@@ -145,6 +171,11 @@ struct TextQuizReducer {
         state.userAnswers = []
         state.currentQuestionIndex = 0
         state.isLastQuestion = questions.count == 1
+        return .none
+
+      case .stageQuestionsLoadFailed(let errorMessage):
+        state.isLoading = false
+        state.errorMessage = errorMessage
         return .none
       }
     }

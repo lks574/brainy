@@ -66,7 +66,7 @@ extension QuizResultPage {
                   .font(.system(size: 56, weight: .bold))
                   .foregroundColor(.brainyPrimary)
 
-                Text("/ 10")
+                Text("/ 5")
                   .font(.brainyTitleMedium)
                   .foregroundColor(.brainyTextSecondary)
                   .padding(.bottom, 8)

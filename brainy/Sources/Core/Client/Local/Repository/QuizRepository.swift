@@ -66,6 +66,19 @@ extension QuizRepository {
     try dataManager.save()
     return QuizQuestionDTO(from: question)
   }
+
+  func createStageResult(userId: String, stageId: String, score: Int, timeSpent: TimeInterval) throws -> QuizStageResultDTO {
+    let result = QuizStageResultEntity(
+      id: UUID().uuidString,
+      userId: userId,
+      stageId: stageId,
+      score: score,
+      timeSpent: timeSpent
+    )
+    modelContext.insert(result)
+    try dataManager.save()
+    return QuizStageResultDTO(from: result)
+  }
 }
 
 // MARK: - Get
