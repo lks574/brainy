@@ -3,7 +3,11 @@ import ComposableArchitecture
 
 @Reducer
 struct QuizCategorySelectionReducer {
+
   @Dependency(\.navigation) var navigation
+  @Dependency(\.quizClient) var quizClient
+
+  let sideEffect = QuizCategorySelectionSideEffect()
 
   @ObservableState
   struct State: Equatable {
@@ -12,6 +16,11 @@ struct QuizCategorySelectionReducer {
     var selectedCategory: QuizCategory?
     var selectedQuestionFilter: QuestionFilter = .random
     var categoryProgress: [QuizCategory: CategoryProgress] = [:]
+
+    var getCurrentUserID: String {
+      // 실제 구현에서는 UserDefaults, Keychain 등에서 사용자 ID를 가져와야 함
+      return UserDefaults.standard.string(forKey: "current_user_id") ?? "default_user"
+    }
   }
 
   enum Action: BindableAction, Sendable {
@@ -64,8 +73,9 @@ struct QuizCategorySelectionReducer {
         return .none
 
       case .loadCategoryProgress:
-        return .run { send in
-          await send(.categoryProgressLoaded(.mock))
+        return .run { [quizClient, userID = state.getCurrentUserID] send in
+          let progress = await sideEffect.loadCategoryProgressData(userId: userID, quizClient: quizClient)
+          await send(.categoryProgressLoaded(progress))
         }
 
       case .categoryProgressLoaded(let progress):

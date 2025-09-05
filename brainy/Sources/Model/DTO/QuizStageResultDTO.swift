@@ -14,6 +14,22 @@ struct QuizStageResultDTO: Codable, Sendable, Equatable, Identifiable {
   let starsDisplay: String
 }
 
+extension QuizStageResultDTO {
+  init(from entity: QuizStageResultEntity) {
+    self.id = entity.id
+    self.userId = entity.userId
+    self.stageId = entity.stageId
+    self.score = entity.score
+    self.stars = entity.stars
+    self.timeSpent = entity.timeSpent
+    self.isCleared = entity.isCleared
+    self.completedAt = entity.completedAt
+    self.accuracy = entity.accuracy
+    self.accuracyPercentage = entity.accuracyPercentage
+    self.starsDisplay = entity.starsDisplay
+  }
+}
+
 // MARK: - Mock Data
 extension QuizStageResultDTO {
   static let mock = QuizStageResultDTO(

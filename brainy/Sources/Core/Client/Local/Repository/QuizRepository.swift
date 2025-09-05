@@ -46,6 +46,8 @@ final class QuizRepository {
   }
 }
 
+// MARK: - Creat
+
 extension QuizRepository {
   func createQuestion(_ req: CreateQuizQuestionRequest) throws -> QuizQuestionDTO {
     let question = QuizQuestionEntity(
@@ -63,6 +65,44 @@ extension QuizRepository {
     modelContext.insert(question)
     try dataManager.save()
     return QuizQuestionDTO(from: question)
+  }
+}
+
+// MARK: - Get
+
+extension QuizRepository {
+  func getCategoryStageStats(userId: String, category: QuizCategory) throws -> (completedStages: Int, totalStars: Int, unlockedStage: Int) {
+    // Get all stages for this category
+    let stages = try fetchStagesByCategory(category)
+
+    // Get user's results for this category
+    let results = try fetchStageResults(userId: userId)
+    let categoryResults = results.filter { result in
+      stages.contains { $0.id == result.stageId }
+    }
+
+    let completedStages = categoryResults.filter { $0.isCleared }.count
+    let totalStars = categoryResults.reduce(0) { $0 + $1.stars }
+    let unlockedStage = completedStages + 1
+
+    return (completedStages, totalStars, unlockedStage)
+  }
+}
+
+// MARK: - Fetch
+
+extension QuizRepository {
+  func fetchStagesByCategory(_ category: QuizCategory) throws -> [QuizStageDTO] {
+    let predicate = #Predicate<QuizStageEntity> { stage in
+      stage.category == category.rawValue
+    }
+    let descriptor = FetchDescriptor<QuizStageEntity>(
+      predicate: predicate,
+      sortBy: [SortDescriptor(\.stageNumber)]
+    )
+
+    let stages = try modelContext.fetch(descriptor)
+    return stages.map { QuizStageDTO(from: $0) }
   }
 }
 
@@ -99,5 +139,35 @@ extension QuizRepository {
       )
       modelContext.insert(question)
     }
+  }
+
+  private func fetchStageResults(userId: String? = nil, stageId: String? = nil, limit: Int? = nil) throws -> [QuizStageResultDTO] {
+    var predicate: Predicate<QuizStageResultEntity>?
+
+    if let userId = userId, let stageId = stageId {
+      predicate = #Predicate<QuizStageResultEntity> { result in
+        result.userId == userId && result.stageId == stageId
+      }
+    } else if let userId = userId {
+      predicate = #Predicate<QuizStageResultEntity> { result in
+        result.userId == userId
+      }
+    } else if let stageId = stageId {
+      predicate = #Predicate<QuizStageResultEntity> { result in
+        result.stageId == stageId
+      }
+    }
+
+    var descriptor = FetchDescriptor<QuizStageResultEntity>(
+      predicate: predicate,
+      sortBy: [SortDescriptor(\.completedAt, order: .reverse)]
+    )
+
+    if let limit = limit {
+      descriptor.fetchLimit = limit
+    }
+
+    let results = try modelContext.fetch(descriptor)
+    return results.map { QuizStageResultDTO(from: $0) }
   }
 }
