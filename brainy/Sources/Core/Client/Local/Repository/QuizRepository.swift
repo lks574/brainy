@@ -104,6 +104,19 @@ extension QuizRepository {
     let stages = try modelContext.fetch(descriptor)
     return stages.map { QuizStageDTO(from: $0) }
   }
+
+  func fetchQuestionsForStage(stageId: String) throws -> [QuizQuestionDTO] {
+    let predicate = #Predicate<QuizQuestionEntity> { question in
+      question.stageId == stageId
+    }
+    let descriptor = FetchDescriptor<QuizQuestionEntity>(
+      predicate: predicate,
+      sortBy: [SortDescriptor(\.orderInStage)]
+    )
+
+    let questions = try modelContext.fetch(descriptor)
+    return questions.map { QuizQuestionDTO(from: $0) }
+  }
 }
 
 extension QuizRepository {

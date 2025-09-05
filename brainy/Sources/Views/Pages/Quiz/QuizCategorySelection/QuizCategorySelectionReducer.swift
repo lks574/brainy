@@ -34,6 +34,7 @@ struct QuizCategorySelectionReducer {
   }
 
   struct CategoryProgress: Equatable {
+    let stageID: String?
     let totalStages: Int
     let completedStages: Int
 
@@ -57,11 +58,18 @@ struct QuizCategorySelectionReducer {
         }
 
       case .goToQuizPlay:
+        guard
+          let progress = state.categoryProgress[state.selectedCategory ?? .general],
+          let stageID = progress.stageID
+        else {
+          print("Error: Stage 없음")
+          return .none
+        }
         return .run { [state] _ in
           await navigation.goToTextQuiz(.init(
             quizMode: state.quizMode,
             quizCategory: state.selectedCategory ?? .general,
-            stageID: "1"))
+            stageID: stageID))
         }
 
       case .changeFilter(let filter):
@@ -90,6 +98,7 @@ extension [QuizCategory: QuizCategorySelectionReducer.CategoryProgress] {
   fileprivate static var mock: Self {
     [
       .general: .init(
+        stageID: "stage-1",
         totalStages: 10,
         completedStages: 1
       ),

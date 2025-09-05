@@ -11,6 +11,7 @@ struct QuizClient {
   var getCategoryStageStats: @Sendable (String, QuizCategory) async throws -> (completedStages: Int, totalStars: Int, unlockedStage: Int)
 
   var fetchStagesByCategory: @Sendable (QuizCategory) async throws -> [QuizStageDTO]
+  var fetchQuestionsForStage: @Sendable (String) async throws -> [QuizQuestionDTO]
 }
 
 extension QuizClient: DependencyKey {
@@ -31,6 +32,9 @@ extension QuizClient: DependencyKey {
       },
       fetchStagesByCategory: { category in
         try repository.fetchStagesByCategory(category)
+      },
+      fetchQuestionsForStage: { stageId in
+        try repository.fetchQuestionsForStage(stageId: stageId)
       }
     )
   }()
@@ -42,7 +46,8 @@ extension QuizClient {
     deleteAllData: {},
     createQuestion: { _ in .mock },
     getCategoryStageStats: { _, _ in (completedStages: 5, totalStars: 12, unlockedStage: 6) },
-    fetchStagesByCategory: { _ in .mockList }
+    fetchStagesByCategory: { _ in .mockList },
+    fetchQuestionsForStage: { _ in .mockList }
   )
 
   static let previewValue = testValue
