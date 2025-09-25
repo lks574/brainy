@@ -88,7 +88,10 @@ struct TextQuizReducer {
         )
 
       case .tapRetry:
-        return .none
+        return .merge(
+          .send(.stopTimer),
+          .send(.getStageQuestions)
+        )
 
       case .tapSubmitAnswer:
         guard state.hasAnswered else { return .none }
