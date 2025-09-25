@@ -53,6 +53,8 @@ enum TextQuizPage {
                 store.send(.tapOption(index))
               case .submitAnswer:
                 store.send(.tapSubmitAnswer)
+              case .skip:
+                store.send(.tapSkip)
               }
             })
         }
@@ -66,4 +68,3 @@ enum TextQuizPage {
     }
   }
 }
-

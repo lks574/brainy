@@ -53,6 +53,7 @@ struct TextQuizReducer {
     case tapRetry
     case tapSubmitAnswer
     case tapOption(Int)
+    case tapSkip
 
     case startStage
     case completeStage
@@ -133,6 +134,30 @@ struct TextQuizReducer {
 
       case .timeUp:
         // 시간 종료: 무응답으로 기록하고 다음 문제로 이동 또는 완료
+        let userAnswer = sideEffect.getUserAnswer(
+          selectedIndex: nil,
+          shortAnswer: "",
+          question: state.currentQuestion
+        )
+        state.userAnswers.append(userAnswer)
+
+        if state.currentQuestionIndex < state.quizQuestions.count - 1 {
+          state.currentQuestionIndex += 1
+          state.selectedOptionIndex = nil
+
+          state.progress = Float(state.currentQuestionIndex) / Float(state.quizQuestions.count)
+          state.isLastQuestion = state.currentQuestionIndex == state.quizQuestions.count - 1
+
+          return .send(.startTimer(perQuestionDuration))
+        } else {
+          return .merge(
+            .send(.stopTimer),
+            .send(.completeStage)
+          )
+        }
+
+      case .tapSkip:
+        // 사용자 건너뛰기: 무응답으로 기록하고 다음 문제로 이동 또는 완료
         let userAnswer = sideEffect.getUserAnswer(
           selectedIndex: nil,
           shortAnswer: "",

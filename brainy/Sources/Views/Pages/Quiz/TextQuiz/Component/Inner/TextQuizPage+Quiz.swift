@@ -20,7 +20,9 @@ extension TextQuizPage {
       case back
       case option(Int)
       case submitAnswer
+      case skip
     }
+    @State private var showSkipConfirm = false
 
     var body: some View {
       VStack(spacing: 0) {
@@ -52,7 +54,24 @@ extension TextQuizPage {
         TextQuizPage.BottomActionView(
           hasAnswered: hasAnswered,
           isLastQuestion: isLastQuestion,
-          tapSubmitAnswer: { action(.submitAnswer) })
+          tapSubmitAnswer: { action(.submitAnswer) },
+          tapSkip: {
+            if timeRemaining < 5 {
+              action(.skip)
+            } else {
+              showSkipConfirm = true
+            }
+          })
+        .confirmationDialog(
+          "이 문제를 건너뛸까요?",
+          isPresented: $showSkipConfirm,
+          titleVisibility: .visible
+        ) {
+          Button("건너뛰기", role: .destructive) { action(.skip) }
+          Button("취소", role: .cancel) { }
+        } message: {
+          Text("이 문제는 오답으로 처리됩니다.")
+        }
       }
     }
   }
@@ -192,6 +211,7 @@ extension TextQuizPage {
     let hasAnswered: Bool
     let isLastQuestion: Bool
     let tapSubmitAnswer: () -> Void
+    let tapSkip: () -> Void
 
     var body: some View {
       VStack(spacing: 16) {
@@ -204,7 +224,7 @@ extension TextQuizPage {
             style: .ghost,
             size: .medium
           ) {
-            tapSubmitAnswer()
+            tapSkip()
           }
 
           BrainyButton(
