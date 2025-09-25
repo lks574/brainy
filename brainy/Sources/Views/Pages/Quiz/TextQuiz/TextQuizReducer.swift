@@ -6,7 +6,9 @@ struct TextQuizReducer {
 
   @Dependency(\.navigation) var navigation
   @Dependency(\.quizClient) var quizClient
+  @Dependency(\.continuousClock) var clock
   let sideEffect = TextQuizSideEffect()
+  private let perQuestionDuration: Int = 15
 
   @ObservableState
   struct State: Equatable {
@@ -58,7 +60,15 @@ struct TextQuizReducer {
     case getStageQuestions
     case fetchStageQuestions([QuizQuestionDTO])
     case stageQuestionsLoadFailed(String)
+
+    // Timer
+    case startTimer(Int)
+    case tick
+    case stopTimer
+    case timeUp
   }
+
+  enum CancelID { case timer }
 
   var body: some ReducerOf<Self> {
     BindingReducer()
@@ -69,9 +79,12 @@ struct TextQuizReducer {
         return .none
 
       case .goToBack:
-        return .run { _ in
-          await navigation.goToBack()
-        }
+        return .merge(
+          .send(.stopTimer),
+          .run { _ in
+            await navigation.goToBack()
+          }
+        )
 
       case .tapRetry:
         return .none
@@ -107,11 +120,40 @@ struct TextQuizReducer {
 
           // 마지막 문제인지 확인
           state.isLastQuestion = state.currentQuestionIndex == state.quizQuestions.count - 1
+
+          // 다음 문제 타이머 시작
+          return .send(.startTimer(perQuestionDuration))
         } else {
           // 스테이지 완료
-          return .send(.completeStage)
+          return .merge(
+            .send(.stopTimer),
+            .send(.completeStage)
+          )
         }
-        return .none
+
+      case .timeUp:
+        // 시간 종료: 무응답으로 기록하고 다음 문제로 이동 또는 완료
+        let userAnswer = sideEffect.getUserAnswer(
+          selectedIndex: nil,
+          shortAnswer: "",
+          question: state.currentQuestion
+        )
+        state.userAnswers.append(userAnswer)
+
+        if state.currentQuestionIndex < state.quizQuestions.count - 1 {
+          state.currentQuestionIndex += 1
+          state.selectedOptionIndex = nil
+
+          state.progress = Float(state.currentQuestionIndex) / Float(state.quizQuestions.count)
+          state.isLastQuestion = state.currentQuestionIndex == state.quizQuestions.count - 1
+
+          return .send(.startTimer(perQuestionDuration))
+        } else {
+          return .merge(
+            .send(.stopTimer),
+            .send(.completeStage)
+          )
+        }
 
       case .tapOption(let index):
         state.selectedOptionIndex = index
@@ -171,12 +213,37 @@ struct TextQuizReducer {
         state.userAnswers = []
         state.currentQuestionIndex = 0
         state.isLastQuestion = questions.count == 1
-        return .none
+        if questions.isEmpty {
+          return .none
+        } else {
+          return .send(.startTimer(perQuestionDuration))
+        }
 
       case .stageQuestionsLoadFailed(let errorMessage):
         state.isLoading = false
         state.errorMessage = errorMessage
         return .none
+
+      case .startTimer(let seconds):
+        state.timeRemaining = seconds
+        return .run { [clock] send in
+          for await _ in clock.timer(interval: .seconds(1)) {
+            await send(.tick)
+          }
+        }
+        .cancellable(id: CancelID.timer, cancelInFlight: true)
+
+      case .tick:
+        if state.timeRemaining > 0 {
+          state.timeRemaining -= 1
+          if state.timeRemaining == 0 {
+            return .send(.timeUp)
+          }
+        }
+        return .none
+
+      case .stopTimer:
+        return .cancel(id: CancelID.timer)
       }
     }
   }
