@@ -42,7 +42,9 @@ struct QuizModeSelectionReducer {
         return .none
 
       case .goToHistoryList:
-        return .none
+        return .run { _ in
+          await navigation.goToHistoryList()
+        }
 
       case .loadQuiz:
         return .run { _ in

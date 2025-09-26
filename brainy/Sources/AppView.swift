@@ -48,6 +48,8 @@ struct AppView: View {
           QuizModeSelectionPage.RootView(store: store)
         case .quizCategorySelection(let store):
           QuizCategorySelectionPage.RootView(store: store)
+        case .historyList(let store):
+          HistoryListPage.RootView(store: store)
         }
       }
     )
@@ -61,3 +63,4 @@ struct AppView: View {
     }
   }
 }
+

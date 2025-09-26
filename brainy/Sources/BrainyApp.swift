@@ -45,6 +45,9 @@ struct BrainyApp: App {
       goToClose: { [store] in
         await store.send(.goToClose)
       },
+      goToHistoryList: { [store] in
+        await store.send(.goToHistoryList)
+      },
       goToBack: { [store] in
         await store.send(.goToBack)
       }

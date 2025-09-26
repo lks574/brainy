@@ -23,6 +23,8 @@ struct AppReducer {
 
     case goToClose
     case goToBack
+
+    case goToHistoryList
   }
 
   @Reducer(state: .equatable)
@@ -77,6 +79,10 @@ struct AppReducer {
         }
         return .none
 
+      case .goToHistoryList:
+        state.path.append(.historyList(.init()))
+        return .none
+
       case .path, .present:
         return .none
       }
@@ -102,6 +108,7 @@ enum Path {
   case textQuiz(TextQuizReducer)
   case quizModeSelection(QuizModeSelectionReducer)
   case quizCategorySelection(QuizCategorySelectionReducer)
+  case historyList(HistoryListReducer)
 }
 
 extension Path.State {
@@ -110,6 +117,7 @@ extension Path.State {
       case .textQuiz: "textQuiz"
       case .quizModeSelection: "quizModeSelection"
       case .quizCategorySelection: "quizCategorySelection"
+      case .historyList: "historyList"
     }
   }
 }
