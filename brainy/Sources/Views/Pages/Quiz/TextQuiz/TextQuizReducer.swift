@@ -69,7 +69,11 @@ struct TextQuizReducer {
     case timeUp
   }
 
-  enum CancelID { case timer }
+  enum CancelID { 
+    case timer
+    case loadQuestions
+    case completeStage
+  }
 
   var body: some ReducerOf<Self> {
     BindingReducer()
@@ -82,6 +86,8 @@ struct TextQuizReducer {
       case .goToBack:
         return .merge(
           .send(.stopTimer),
+          .cancel(id: CancelID.loadQuestions),
+          .cancel(id: CancelID.completeStage),
           .run { _ in
             await navigation.goToBack()
           }
@@ -91,6 +97,8 @@ struct TextQuizReducer {
         state.startTime = Date()
         return .merge(
           .send(.stopTimer),
+          .cancel(id: CancelID.loadQuestions),
+          .cancel(id: CancelID.completeStage),
           .send(.getStageQuestions)
         )
 
@@ -212,6 +220,7 @@ struct TextQuizReducer {
             await send(.stageQuestionsLoadFailed("결과 저장에 실패했습니다."))
           }
         }
+        .cancellable(id: CancelID.completeStage, cancelInFlight: true)
 
       case .getStageQuestions:
         state.isLoading = true
@@ -229,10 +238,13 @@ struct TextQuizReducer {
             // 스테이지별 문제 로드
             let questions = try await quizClient.fetchQuestionsForStage(stageId)
             await send(.fetchStageQuestions(questions))
+          } catch is CancellationError {
+            // 취소는 무시
           } catch {
             await send(.stageQuestionsLoadFailed(error.localizedDescription))
           }
         }
+        .cancellable(id: CancelID.loadQuestions, cancelInFlight: true)
 
       case .fetchStageQuestions(let questions):
         state.isLoading = false
@@ -245,13 +257,16 @@ struct TextQuizReducer {
         if questions.isEmpty {
           return .none
         } else {
-          return .send(.startTimer(perQuestionDuration))
+          return .merge(
+            .send(.stopTimer),
+            .send(.startTimer(perQuestionDuration))
+          )
         }
 
       case .stageQuestionsLoadFailed(let errorMessage):
         state.isLoading = false
         state.errorMessage = errorMessage
-        return .none
+        return .send(.stopTimer)
 
       case .startTimer(let seconds):
         state.timeRemaining = seconds
@@ -277,4 +292,3 @@ struct TextQuizReducer {
     }
   }
 }
-

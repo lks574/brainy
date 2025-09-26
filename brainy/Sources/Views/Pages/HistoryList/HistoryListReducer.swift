@@ -85,6 +85,8 @@ struct HistoryListReducer {
     case stageCategoryMapLoaded([String: QuizCategory])
     case fetchResultsResponse(Result<[QuizStageResultDTO], Error>)
   }
+  
+  enum CancelID { case loadHistory }
 
   var body: some ReducerOf<Self> {
     BindingReducer()
@@ -121,6 +123,7 @@ struct HistoryListReducer {
             await send(.stageCategoryMapLoaded(map))
           }
         )
+        .cancellable(id: CancelID.loadHistory, cancelInFlight: true)
 
       case let .stageCategoryMapLoaded(map):
         state.stageCategoryById = map

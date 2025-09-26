@@ -75,7 +75,35 @@ extension QuizRepository {
       score: score,
       timeSpent: timeSpent
     )
+
+    let stageDescriptor = FetchDescriptor<QuizStageEntity>(
+      predicate: #Predicate { $0.id == stageId }
+    )
+    let stages = try modelContext.fetch(stageDescriptor)
+    let stage = stages.first
+
     modelContext.insert(result)
+
+    if let stage = stage {
+      result.stage = stage
+    }
+
+    let total = stage?.totalQuestions ?? 10
+    let requiredAccuracy = stage?.requiredAccuracy ?? 0.7
+    let accuracy = total > 0 ? Double(score) / Double(total) : 0
+    result.isCleared = accuracy >= requiredAccuracy
+
+    // 별점 계산 (예: 정확도 60/70/90 기준으로 0~3)
+    if accuracy >= 0.9 {
+      result.stars = 3
+    } else if accuracy >= 0.7 {
+      result.stars = 2
+    } else if accuracy >= 0.6 {
+      result.stars = 1
+    } else {
+      result.stars = 0
+    }
+
     try dataManager.save()
     return QuizStageResultDTO(from: result)
   }
@@ -201,4 +229,3 @@ extension QuizRepository {
     return results.map { QuizStageResultDTO(from: $0) }
   }
 }
-

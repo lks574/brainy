@@ -6,8 +6,8 @@ final class QuizStageResultEntity {
   @Attribute(.unique) var id: String
   var userId: String
   var stageId: String
-  var score: Int                    // 맞춘 문제 수 (0-5)
-  var stars: Int                    // 별점 (1-3개)
+  var score: Int                    // 맞춘 문제 수 (해당 스테이지의 총 문항 수 대비)
+  var stars: Int                    // 별점 (0-3개)
   var timeSpent: TimeInterval       // 소요 시간
   var isCleared: Bool               // 70% 이상 여부
   var completedAt: Date
@@ -24,25 +24,16 @@ final class QuizStageResultEntity {
     self.timeSpent = timeSpent
     self.completedAt = Date()
 
-    // 정확도 계산
-    let accuracy = Double(score) / 5
-    self.isCleared = accuracy >= 0.6
-
-    // 별점 계산
-    if accuracy >= 0.9 {
-      self.stars = 3
-    } else if accuracy >= 0.7 {
-      self.stars = 2
-    } else if accuracy >= 0.6 {
-      self.stars = 1
-    } else {
-      self.stars = 0
-    }
+    // 초기값: 정확도/별점/클리어 여부는 저장소에서 스테이지 정보 기반으로 계산하여 설정
+    self.isCleared = false
+    self.stars = 0
   }
 
   /// 정확도 계산
   var accuracy: Double {
-    return Double(score) / 5.0
+    let total = stage?.totalQuestions ?? 10
+    guard total > 0 else { return 0 }
+    return Double(score) / Double(total)
   }
 
   /// 정확도 퍼센트 문자열
