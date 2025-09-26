@@ -10,6 +10,7 @@ struct QuizClient {
   var createStageResult: @Sendable (String, String, Int, TimeInterval) async throws -> QuizStageResultDTO
 
   var getCategoryStageStats: @Sendable (String, QuizCategory) async throws -> (completedStages: Int, totalStars: Int, unlockedStage: Int)
+  var fetchStageResults: @Sendable (String) async throws -> [QuizStageResultDTO]
 
   var fetchStagesByCategory: @Sendable (QuizCategory) async throws -> [QuizStageDTO]
   var fetchQuestionsForStage: @Sendable (String) async throws -> [QuizQuestionDTO]
@@ -34,6 +35,9 @@ extension QuizClient: DependencyKey {
       getCategoryStageStats: { userId, category in
         try repository.getCategoryStageStats(userId: userId, category: category)
       },
+      fetchStageResults: { userId in
+        try repository.fetchStageResults(userId: userId)
+      },
       fetchStagesByCategory: { category in
         try repository.fetchStagesByCategory(category)
       },
@@ -51,6 +55,7 @@ extension QuizClient {
     createQuestion: { _ in .mock },
     createStageResult: { _, _, _, _ in .mock },
     getCategoryStageStats: { _, _ in (completedStages: 5, totalStars: 12, unlockedStage: 6) },
+    fetchStageResults: { _ in .mockList },
     fetchStagesByCategory: { _ in .mockList },
     fetchQuestionsForStage: { _ in .mockList }
   )

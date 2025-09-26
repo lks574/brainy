@@ -133,6 +133,10 @@ extension QuizRepository {
 }
 
 extension QuizRepository {
+  func fetchStageResults(userId: String) throws -> [QuizStageResultDTO] {
+    try fetchStageResults(userId: userId, stageId: nil, limit: nil)
+  }
+
   private func createStagesFromJSON(_ stages: [CreateQuizStageRequest]) throws {
     for stageRequest in stages {
       let stage = QuizStageEntity(
@@ -197,3 +201,4 @@ extension QuizRepository {
     return results.map { QuizStageResultDTO(from: $0) }
   }
 }
+
