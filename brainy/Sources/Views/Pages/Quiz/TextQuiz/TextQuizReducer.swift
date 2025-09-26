@@ -88,6 +88,7 @@ struct TextQuizReducer {
         )
 
       case .tapRetry:
+        state.startTime = Date()
         return .merge(
           .send(.stopTimer),
           .send(.getStageQuestions)
@@ -276,3 +277,4 @@ struct TextQuizReducer {
     }
   }
 }
+
