@@ -17,6 +17,8 @@ struct AppReducer {
     case goToQuizCategorySelection(QuizMode)
     case goToQuizResult(QuizStageResultDTO)
 
+    case restartTextQuiz
+
     case goToCloseWithCategorySelection(QuizMode)
 
     case goToClose
@@ -47,6 +49,17 @@ struct AppReducer {
 
       case .goToQuizResult(let result):
         state.present = .quizResult(.init(stageResult: result))
+        return .none
+
+      case .restartTextQuiz:
+        // Dismiss result first, then forward retry to the most recent TextQuiz on the stack
+        state.present = nil
+        if let idx = state.path.lastIndex(where: {
+          if case .textQuiz = $0 { return true } else { return false }
+        }) {
+          let id = state.path.ids[idx]
+          return .send(.path(.element(id: id, action: .textQuiz(.tapRetry))))
+        }
         return .none
 
       case .goToCloseWithCategorySelection(let mode):

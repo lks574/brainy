@@ -66,7 +66,11 @@ struct QuizResultReducer {
         return .none
 
       case .retryStage:
-        return .none
+        return .run { _ in
+          // Close the result sheet to reveal the existing TextQuiz underneath, then restart it
+          await navigation.goToClose()
+          await navigation.restartTextQuiz()
+        }
 
       case .goToClose:
         return .run { _ in
@@ -79,3 +83,4 @@ struct QuizResultReducer {
     }
   }
 }
+
